@@ -11,7 +11,7 @@ from datetime import datetime
 st.set_page_config(page_title="YouTube Outlier Hunter", layout="wide", page_icon="💎")
 ARQUIVO_SALVOS = "canais_salvos.csv"
 
-# --- FUNÇÕES DE PERSISTÊNCIA (CSV) ---
+# --- FUNÇÕES DE BANCO DE DADOS (CSV) ---
 def carregar_salvos():
     colunas = ['Nome', 'Inscritos', 'Vídeos', 'Média Views', 'País', 'Criação', 'Dias Vida', 'Link', 'Data Descoberta']
     if not os.path.exists(ARQUIVO_SALVOS):
@@ -22,7 +22,7 @@ def salvar_canal(dados_canal):
     df = carregar_salvos()
     # Verifica duplicidade pelo Link
     if dados_canal['Link'] not in df['Link'].values:
-        # Filtra apenas as colunas que existem no CSV para evitar erro
+        # Filtra apenas as colunas que existem no CSV
         linha_limpa = {k: v for k, v in dados_canal.items() if k in df.columns}
         novo_df = pd.DataFrame([linha_limpa])
         df = pd.concat([df, novo_df], ignore_index=True)
@@ -36,13 +36,13 @@ def get_google_suggestions(termo_raiz):
     sugestoes = set()
     alfabeto = "abcdefghijklmnopqrstuvwxyz"
     
-    # Busca direta
+    # 1. Busca direta
     try:
         r = requests.get(url, params={'client': 'firefox', 'ds': 'yt', 'q': termo_raiz})
         if r.status_code == 200: [sugestoes.add(item) for item in r.json()[1]]
     except: pass
 
-    # Busca exploratória (Termo + Letra aleatória)
+    # 2. Busca exploratória (Termo + Letra aleatória)
     for letra in random.sample(alfabeto, 3):
         try:
             r = requests.get(url, params={'client': 'firefox', 'ds': 'yt', 'q': f"{termo_raiz} {letra}"})
@@ -163,14 +163,14 @@ tab_busca, tab_discovery, tab_salvos = st.tabs(["🔍 Busca Avançada", "🧠 De
 
 # === ABA 1: BUSCA MANUAL ===
 with tab_busca:
-    # Inputs de Texto e Select
+    # Linha 1: Texto e Duração
     c1, c2 = st.columns([3, 1])
     query = c1.text_input("Palavra-chave / Nicho", "Inteligência Artificial")
     duracao = c2.selectbox("Filtro de Duração", ["Qualquer", "Médio (4-20m)", "Longo (>20m)"], index=1, help="Evita Shorts")
     
     st.markdown("---")
     
-    # Filtros de Range (Lado a Lado)
+    # Linha 2: Filtros de Range
     st.markdown("**📏 Filtros de Tamanho**")
     col_sub1, col_sub2, col_vid1, col_vid2 = st.columns(4)
     
@@ -188,6 +188,7 @@ with tab_busca:
     # Botões de Ação
     col_btn1, col_btn2 = st.columns([1, 3])
     
+    # Botão 1: Nova Busca
     if col_btn1.button("🔍 Buscar", type="primary"):
         if api_key:
             st.session_state['resultados_busca'] = []
@@ -200,21 +201,37 @@ with tab_busca:
             if not res: st.warning("Nenhum canal encontrado.")
         else: st.error("Falta a API Key!")
 
+    # Botão 2: Carregar Mais
     if st.session_state['next_page_token'] and st.session_state['termo_atual']:
         if col_btn2.button(f"🔄 Carregar Mais para '{st.session_state['termo_atual']}'"):
              res = executar_busca(
                 api_key, st.session_state['termo_atual'], max_results, mapa_dur[duracao], 
                 min_subs, max_subs, min_videos, max_videos, region_param, True
              )
-             st.session_state['resultados_busca'].extend(res)
-             if not res: st.toast("Fim dos resultados nesta página.")
+             
+             # --- FILTRO ANTI-DUPLICIDADE (NOVO) ---
+             # Pega os links que já estão na tela
+             links_existentes = {c['Link'] for c in st.session_state['resultados_busca']}
+             # Filtra os novos que não estão na lista
+             novos_filtrados = [c for c in res if c['Link'] not in links_existentes]
+             
+             st.session_state['resultados_busca'].extend(novos_filtrados)
+             
+             if not res: 
+                 st.toast("Fim dos resultados no YouTube.")
+             elif not novos_filtrados: 
+                 st.toast("Canais encontrados já estavam na lista.")
+             else:
+                 st.toast(f"{len(novos_filtrados)} novos canais adicionados!")
 
     # Exibição dos Cards
     if st.session_state['resultados_busca']:
         st.divider()
         st.write(f"Canais na lista: **{len(st.session_state['resultados_busca'])}**")
         
-        for canal in st.session_state['resultados_busca']:
+        # --- LOOP COM CORREÇÃO DE CHAVE DUPLICADA ---
+        # Usamos enumerate(..., start=0) para ter o índice 'i'
+        for i, canal in enumerate(st.session_state['resultados_busca']):
             with st.container(border=True):
                 col_img, col_info, col_metrics, col_btn = st.columns([1, 4, 2, 1])
                 
@@ -222,7 +239,6 @@ with tab_busca:
                 
                 with col_info:
                     st.markdown(f"### [{canal['Nome']}]({canal['Link']})")
-                    # Lógica visual de idade
                     if canal['Dias Vida'] < 90:
                         st.caption(f"👶 **Novo!** Criado em {canal['Criação']} ({canal['Dias Vida']} dias)")
                     else:
@@ -230,7 +246,6 @@ with tab_busca:
                     st.markdown(f"📍 País: **{canal['País']}**")
                 
                 with col_metrics:
-                    # Lógica visual de viralidade
                     is_viral = canal['Média Views'] > canal['Inscritos']
                     cor = "green" if is_viral else "off"
                     emoji = "🔥" if is_viral else ""
@@ -239,7 +254,8 @@ with tab_busca:
                     st.markdown(f"**Vídeos:** {canal['Vídeos']}")
                     st.markdown(f"**Média:** :{cor}[{canal['Média Views']}] {emoji}")
                 
-                if col_btn.button("Salvar 💾", key=f"save_{canal['Link']}"):
+                # AQUI ESTAVA O ERRO, AGORA CORRIGIDO COM O ÍNDICE 'i'
+                if col_btn.button("Salvar 💾", key=f"save_{i}_{canal['Link']}"):
                     if salvar_canal(canal): st.toast("Canal Salvo!")
                     else: st.toast("Já estava salvo.")
 
@@ -255,9 +271,8 @@ with tab_discovery:
         st.write("Clique para buscar outliers nestes sub-nichos:")
         cols = st.columns(3)
         for i, sug in enumerate(st.session_state['sugestoes_cache']):
-            if cols[i%3].button(f"🔎 {sug}"):
+            if cols[i%3].button(f"🔎 {sug}", key=f"sug_{i}"):
                 if api_key:
-                    # Reseta e busca
                     st.session_state['resultados_busca'] = []
                     st.session_state['next_page_token'] = None
                     res = executar_busca(api_key, sug, 50, "medium", min_subs, max_subs, min_videos, max_videos, region_param, False)
