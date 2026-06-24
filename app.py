@@ -22,244 +22,255 @@ ARQUIVO_SALVOS = "canais_salvos.csv"
 
 
 # ============================================================
-# CSS CUSTOMIZADO COM LIGHT / DARK MODE
+# CSS CUSTOMIZADO
+# Usa o tema nativo do Streamlit: claro/escuro automático
 # ============================================================
 
-def aplicar_estilo_saas(dark_mode=False):
-    if dark_mode:
-        bg = "#0b1120"
-        sidebar_bg = "#111827"
-        surface = "#111827"
-        surface_2 = "#1f2937"
-        input_bg = "#1f2937"
-        text = "#f9fafb"
-        muted = "#9ca3af"
-        border = "#374151"
-        tab_bg = "#1f2937"
-        tab_active = "#f9fafb"
-        tab_active_text = "#111827"
-        shadow = "0 18px 45px rgba(0, 0, 0, 0.35)"
-        info_bg = "#1e3a8a"
-        info_text = "#dbeafe"
-    else:
-        bg = "#f7f8fb"
-        sidebar_bg = "#f1f4f9"
-        surface = "#ffffff"
-        surface_2 = "#f9fafb"
-        input_bg = "#f3f5f9"
-        text = "#111827"
-        muted = "#6b7280"
-        border = "#e5e7eb"
-        tab_bg = "#eef1f6"
-        tab_active = "#111827"
-        tab_active_text = "#ffffff"
-        shadow = "0 18px 45px rgba(15, 23, 42, 0.08)"
-        info_bg = "#dbeafe"
-        info_text = "#075bb5"
-
-    st.markdown(f"""
+def aplicar_estilo_saas():
+    st.markdown("""
     <style>
-        #MainMenu {{visibility: hidden;}}
-        footer {{visibility: hidden;}}
-        header {{visibility: hidden;}}
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
 
-        html, body, [data-testid="stAppViewContainer"] {{
-            background-color: {bg} !important;
-            color: {text} !important;
-        }}
+        :root {
+            --app-bg: var(--st-background-color, var(--background-color, #ffffff));
+            --app-surface: var(--st-secondary-background-color, var(--secondary-background-color, #f6f7fb));
+            --app-text: var(--st-text-color, var(--text-color, #111827));
+            --app-primary: var(--st-primary-color, var(--primary-color, #ff4b4b));
+            --app-border: var(--st-border-color, rgba(128, 128, 128, 0.22));
+            --app-radius: 22px;
+        }
 
-        .block-container {{
+        html, body, [data-testid="stAppViewContainer"] {
+            background-color: var(--app-bg) !important;
+            color: var(--app-text) !important;
+        }
+
+        .block-container {
             padding-top: 2rem !important;
             padding-bottom: 3rem !important;
-            max-width: 1280px;
-        }}
+            max-width: 1180px;
+        }
 
-        [data-testid="stSidebar"] {{
-            background: {sidebar_bg} !important;
-            border-right: 1px solid {border};
-        }}
+        [data-testid="stSidebar"] {
+            background-color: var(--app-surface) !important;
+            border-right: 1px solid var(--app-border);
+        }
 
-        [data-testid="stSidebar"] * {{
-            color: {text};
-        }}
-
-        .main-title {{
+        .main-title {
             font-size: 2.45rem;
             font-weight: 850;
             letter-spacing: -0.04em;
-            color: {text};
+            color: var(--app-text);
             margin-bottom: 0.25rem;
-        }}
+        }
 
-        .subtitle {{
-            color: {muted};
+        .subtitle {
+            color: var(--app-text);
+            opacity: 0.68;
             font-size: 1rem;
             margin-bottom: 1.6rem;
-        }}
+        }
 
-        .search-hero {{
-            background: {surface};
-            border: 1px solid {border};
-            border-radius: 26px;
-            padding: 28px;
-            box-shadow: {shadow};
-            margin-bottom: 1.5rem;
-        }}
-
-        .section-title {{
+        .section-title {
             font-size: 1.35rem;
             font-weight: 850;
-            color: {text};
+            color: var(--app-text);
             margin-bottom: 0.25rem;
-        }}
+        }
 
-        .section-caption {{
-            color: {muted};
+        .section-caption {
+            color: var(--app-text);
+            opacity: 0.68;
             font-size: 0.95rem;
             margin-bottom: 1.2rem;
-        }}
+        }
 
-        .stButton > button {{
+        .stButton > button {
             border-radius: 13px !important;
             font-weight: 750 !important;
             min-height: 45px;
             transition: all 0.22s ease-in-out;
-            border: 1px solid {border} !important;
-        }}
+            border: 1px solid var(--app-border) !important;
+        }
 
-        .stButton > button:hover {{
+        .stButton > button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16) !important;
-        }}
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14) !important;
+        }
 
-        .stButton > button[kind="primary"] {{
+        .stButton > button[kind="primary"] {
             background: linear-gradient(135deg, #ff4b4b 0%, #ef4444 100%) !important;
             border: none !important;
             color: white !important;
-        }}
+        }
 
         .stTextInput input,
         .stNumberInput input,
-        textarea {{
-            background-color: {input_bg} !important;
-            color: {text} !important;
+        textarea {
             border-radius: 13px !important;
-            border: 1px solid {border} !important;
-        }}
+            border: 1px solid var(--app-border) !important;
+        }
 
-        .stTextInput input::placeholder {{
-            color: {muted} !important;
-        }}
-
-        .stSelectbox div[data-baseweb="select"] > div {{
-            background-color: {input_bg} !important;
-            color: {text} !important;
+        .stSelectbox div[data-baseweb="select"] > div {
             border-radius: 13px !important;
-            border: 1px solid {border} !important;
-        }}
+            border: 1px solid var(--app-border) !important;
+        }
 
-        .stSlider {{
-            color: {text} !important;
-        }}
-
-        .stTabs [data-baseweb="tab-list"] {{
-            gap: 10px;
-            border-bottom: none;
-            margin-bottom: 1rem;
-        }}
-
-        .stTabs [data-baseweb="tab"] {{
-            background-color: {tab_bg};
-            border-radius: 999px;
-            padding: 10px 18px;
-            color: {muted};
-            font-weight: 750;
-        }}
-
-        .stTabs [aria-selected="true"] {{
-            background: {tab_active} !important;
-            color: {tab_active_text} !important;
-        }}
-
-        .stTabs [data-baseweb="tab-highlight"] {{
-            display: none;
-        }}
-
-        div[data-testid="stVerticalBlock"] > div[style*="border"] {{
-            border-radius: 22px !important;
-            border: 1px solid {border} !important;
-            background-color: {surface} !important;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
+        div[data-testid="stVerticalBlock"] > div[style*="border"] {
+            border-radius: var(--app-radius) !important;
+            border: 1px solid var(--app-border) !important;
+            background-color: var(--app-bg) !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07) !important;
             padding: 1.1rem !important;
-        }}
+        }
 
-        details {{
+        details {
             border-radius: 14px !important;
-            border: 1px solid {border} !important;
-            background-color: {surface_2} !important;
-        }}
+            border: 1px solid var(--app-border) !important;
+            background-color: var(--app-surface) !important;
+        }
 
-        details summary {{
-            color: {text} !important;
-        }}
-
-        [data-testid="stDataFrame"] {{
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-        }}
-
-        .channel-title {{
+        .channel-title {
             font-size: 1.05rem;
             font-weight: 850;
             margin-bottom: 0.15rem;
-        }}
+        }
 
-        .channel-title a {{
-            color: {text};
+        .channel-title a {
+            color: var(--app-text);
             text-decoration: none;
-        }}
+        }
 
-        .channel-title a:hover {{
+        .channel-title a:hover {
             text-decoration: underline;
-        }}
+        }
 
-        .badge {{
+        .badge {
             display: inline-block;
             padding: 5px 10px;
             border-radius: 999px;
             font-size: 0.78rem;
             font-weight: 750;
-            background-color: #eef2ff;
-            color: #3730a3;
+            background-color: rgba(99, 102, 241, 0.13);
+            color: var(--app-text);
             margin-top: 6px;
-        }}
+        }
 
-        .badge-green {{
-            background-color: #ecfdf5;
-            color: #047857;
-        }}
+        .badge-green {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--app-text);
+        }
 
-        .sidebar-tip {{
-            background-color: {info_bg};
-            color: {info_text} !important;
+        .sidebar-tip {
+            background-color: rgba(59, 130, 246, 0.13);
+            color: var(--app-text) !important;
             padding: 16px;
             border-radius: 16px;
             font-weight: 650;
             line-height: 1.45;
-        }}
+        }
 
-        hr {{
+        hr {
             border: none;
-            border-top: 1px solid {border};
+            border-top: 1px solid var(--app-border);
             margin: 1.5rem 0;
-        }}
+        }
 
-        label, p, span, div {{
-            color: inherit;
-        }}
+        [data-testid="stDataFrame"] {
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        /* ====================================================
+           MOBILE
+           ==================================================== */
+        @media screen and (max-width: 768px) {
+            .block-container {
+                padding-top: 1rem !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                padding-bottom: 2rem !important;
+                max-width: 100% !important;
+            }
+
+            .main-title {
+                font-size: 1.85rem !important;
+                line-height: 1.05;
+                margin-top: 0.4rem;
+            }
+
+            .subtitle {
+                font-size: 0.92rem !important;
+                margin-bottom: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 1.15rem !important;
+            }
+
+            .section-caption {
+                font-size: 0.88rem !important;
+            }
+
+            div[data-testid="column"] {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                min-width: 100% !important;
+            }
+
+            .stTabs [data-baseweb="tab-list"] {
+                overflow-x: auto;
+                white-space: nowrap;
+                flex-wrap: nowrap;
+                padding-bottom: 0.3rem;
+            }
+
+            .stTabs [data-baseweb="tab"] {
+                padding: 9px 14px;
+                font-size: 0.86rem;
+            }
+
+            .stButton > button {
+                width: 100% !important;
+                min-height: 46px;
+            }
+
+            div[data-testid="stVerticalBlock"] > div[style*="border"] {
+                border-radius: 18px !important;
+                padding: 0.95rem !important;
+            }
+
+            img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+
+            [data-testid="stDataFrame"] {
+                overflow-x: auto !important;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .main-title {
+                font-size: 1.65rem !important;
+            }
+
+            .subtitle {
+                font-size: 0.86rem !important;
+            }
+
+            .stTabs [data-baseweb="tab"] {
+                padding: 8px 12px;
+                font-size: 0.82rem;
+            }
+        }
     </style>
     """, unsafe_allow_html=True)
+
+
+aplicar_estilo_saas()
 
 
 # ============================================================
@@ -385,9 +396,11 @@ def executar_busca(
             'part': 'snippet',
             'type': 'video',
             'maxResults': max_results,
-            'order': 'date',
-            'pageToken': token
+            'order': 'date'
         }
+
+        if token:
+            search_params['pageToken'] = token
 
         if region_code:
             search_params['regionCode'] = region_code
@@ -500,8 +513,7 @@ valores_iniciais = {
     'resultados_busca': [],
     'next_page_token': None,
     'termo_atual': "",
-    'sugestoes_cache': [],
-    'dark_mode': False
+    'sugestoes_cache': []
 }
 
 for chave, valor in valores_iniciais.items():
@@ -510,23 +522,19 @@ for chave, valor in valores_iniciais.items():
 
 
 # ============================================================
-# SIDEBAR
+# API KEY
 # ============================================================
 
 api_key = st.secrets["GOOGLE_API_KEY"] if "GOOGLE_API_KEY" in st.secrets else None
 
+
+# ============================================================
+# SIDEBAR
+# ============================================================
+
 with st.sidebar:
     st.markdown("## ⚙️ Settings")
     st.caption("Configure a API e os filtros globais da busca.")
-
-    st.markdown("---")
-
-    dark_mode = st.toggle(
-        "🌙 Dark mode",
-        value=st.session_state['dark_mode']
-    )
-
-    st.session_state['dark_mode'] = dark_mode
 
     st.markdown("---")
 
@@ -560,9 +568,6 @@ with st.sidebar:
         Comece amplo e depois refine.
     </div>
     """, unsafe_allow_html=True)
-
-
-aplicar_estilo_saas(st.session_state['dark_mode'])
 
 
 # ============================================================
