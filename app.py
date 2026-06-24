@@ -5,6 +5,7 @@ import os
 import requests
 import random
 import time
+import html
 from datetime import datetime
 
 # ============================================================
@@ -21,206 +22,209 @@ ARQUIVO_SALVOS = "canais_salvos.csv"
 
 
 # ============================================================
-# CSS CUSTOMIZADO - VISUAL MODERNO / SAAS
+# CSS CUSTOMIZADO COM LIGHT / DARK MODE
 # ============================================================
 
-def aplicar_estilo_saas():
-    st.markdown("""
+def aplicar_estilo_saas(dark_mode=False):
+    if dark_mode:
+        bg = "#0b1120"
+        sidebar_bg = "#111827"
+        surface = "#111827"
+        surface_2 = "#1f2937"
+        input_bg = "#1f2937"
+        text = "#f9fafb"
+        muted = "#9ca3af"
+        border = "#374151"
+        tab_bg = "#1f2937"
+        tab_active = "#f9fafb"
+        tab_active_text = "#111827"
+        shadow = "0 18px 45px rgba(0, 0, 0, 0.35)"
+        info_bg = "#1e3a8a"
+        info_text = "#dbeafe"
+    else:
+        bg = "#f7f8fb"
+        sidebar_bg = "#f1f4f9"
+        surface = "#ffffff"
+        surface_2 = "#f9fafb"
+        input_bg = "#f3f5f9"
+        text = "#111827"
+        muted = "#6b7280"
+        border = "#e5e7eb"
+        tab_bg = "#eef1f6"
+        tab_active = "#111827"
+        tab_active_text = "#ffffff"
+        shadow = "0 18px 45px rgba(15, 23, 42, 0.08)"
+        info_bg = "#dbeafe"
+        info_text = "#075bb5"
+
+    st.markdown(f"""
     <style>
-        /* Esconder marcações padrão do Streamlit */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
+        #MainMenu {{visibility: hidden;}}
+        footer {{visibility: hidden;}}
+        header {{visibility: hidden;}}
 
-        /* Fundo geral */
-        html, body, [data-testid="stAppViewContainer"] {
-            background-color: #f7f8fb;
-        }
+        html, body, [data-testid="stAppViewContainer"] {{
+            background-color: {bg} !important;
+            color: {text} !important;
+        }}
 
-        /* Área principal */
-        .block-container {
+        .block-container {{
             padding-top: 2rem !important;
             padding-bottom: 3rem !important;
             max-width: 1280px;
-        }
+        }}
 
-        /* Sidebar */
-        [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #f1f4f9 0%, #ffffff 100%);
-            border-right: 1px solid #e5e7eb;
-        }
+        [data-testid="stSidebar"] {{
+            background: {sidebar_bg} !important;
+            border-right: 1px solid {border};
+        }}
 
-        [data-testid="stSidebar"] h1,
-        [data-testid="stSidebar"] h2,
-        [data-testid="stSidebar"] h3 {
-            color: #111827;
-        }
+        [data-testid="stSidebar"] * {{
+            color: {text};
+        }}
 
-        /* Título principal */
-        .main-title {
-            font-size: 2.5rem;
+        .main-title {{
+            font-size: 2.45rem;
             font-weight: 850;
             letter-spacing: -0.04em;
-            color: #111827;
-            margin-bottom: 0.2rem;
-        }
+            color: {text};
+            margin-bottom: 0.25rem;
+        }}
 
-        .subtitle {
-            color: #6b7280;
+        .subtitle {{
+            color: {muted};
             font-size: 1rem;
-            margin-bottom: 2rem;
-        }
+            margin-bottom: 1.6rem;
+        }}
 
-        /* Cards de métricas */
-        .metric-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-            border: 1px solid #e5e7eb;
-            border-radius: 22px;
-            padding: 24px;
-            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
-            min-height: 130px;
-        }
+        .search-hero {{
+            background: {surface};
+            border: 1px solid {border};
+            border-radius: 26px;
+            padding: 28px;
+            box-shadow: {shadow};
+            margin-bottom: 1.5rem;
+        }}
 
-        .metric-label {
-            color: #6b7280;
-            font-size: 0.92rem;
-            font-weight: 650;
-            margin-bottom: 8px;
-        }
-
-        .metric-value {
-            color: #111827;
-            font-size: 2.15rem;
-            line-height: 1.1;
+        .section-title {{
+            font-size: 1.35rem;
             font-weight: 850;
-            letter-spacing: -0.04em;
-        }
+            color: {text};
+            margin-bottom: 0.25rem;
+        }}
 
-        .metric-helper {
-            margin-top: 10px;
-            color: #9ca3af;
-            font-size: 0.82rem;
-        }
-
-        /* Caixa principal de busca */
-        .search-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 24px;
-            padding: 26px;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-            margin-bottom: 1rem;
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: #111827;
-            margin-bottom: 0.35rem;
-        }
-
-        .section-caption {
-            color: #6b7280;
+        .section-caption {{
+            color: {muted};
             font-size: 0.95rem;
             margin-bottom: 1.2rem;
-        }
+        }}
 
-        /* Botões */
-        .stButton > button {
-            border-radius: 12px !important;
-            font-weight: 700 !important;
-            min-height: 44px;
+        .stButton > button {{
+            border-radius: 13px !important;
+            font-weight: 750 !important;
+            min-height: 45px;
             transition: all 0.22s ease-in-out;
-            border: 1px solid #e5e7eb;
-        }
+            border: 1px solid {border} !important;
+        }}
 
-        .stButton > button:hover {
+        .stButton > button:hover {{
             transform: translateY(-2px);
-            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12) !important;
-        }
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16) !important;
+        }}
 
-        .stButton > button[kind="primary"] {
+        .stButton > button[kind="primary"] {{
             background: linear-gradient(135deg, #ff4b4b 0%, #ef4444 100%) !important;
             border: none !important;
             color: white !important;
-        }
+        }}
 
-        /* Inputs */
         .stTextInput input,
         .stNumberInput input,
-        .stSelectbox div[data-baseweb="select"] > div {
-            border-radius: 12px !important;
-        }
+        textarea {{
+            background-color: {input_bg} !important;
+            color: {text} !important;
+            border-radius: 13px !important;
+            border: 1px solid {border} !important;
+        }}
 
-        /* Tabs modernas */
-        .stTabs [data-baseweb="tab-list"] {
+        .stTextInput input::placeholder {{
+            color: {muted} !important;
+        }}
+
+        .stSelectbox div[data-baseweb="select"] > div {{
+            background-color: {input_bg} !important;
+            color: {text} !important;
+            border-radius: 13px !important;
+            border: 1px solid {border} !important;
+        }}
+
+        .stSlider {{
+            color: {text} !important;
+        }}
+
+        .stTabs [data-baseweb="tab-list"] {{
             gap: 10px;
             border-bottom: none;
             margin-bottom: 1rem;
-        }
+        }}
 
-        .stTabs [data-baseweb="tab"] {
-            background-color: #eef1f6;
+        .stTabs [data-baseweb="tab"] {{
+            background-color: {tab_bg};
             border-radius: 999px;
             padding: 10px 18px;
-            color: #374151;
-            font-weight: 700;
-        }
+            color: {muted};
+            font-weight: 750;
+        }}
 
-        .stTabs [aria-selected="true"] {
-            background: #111827 !important;
-            color: #ffffff !important;
-        }
+        .stTabs [aria-selected="true"] {{
+            background: {tab_active} !important;
+            color: {tab_active_text} !important;
+        }}
 
-        .stTabs [data-baseweb="tab-highlight"] {
+        .stTabs [data-baseweb="tab-highlight"] {{
             display: none;
-        }
+        }}
 
-        /* Containers com borda do Streamlit */
-        div[data-testid="stVerticalBlock"] > div[style*="border"] {
+        div[data-testid="stVerticalBlock"] > div[style*="border"] {{
             border-radius: 22px !important;
-            border: 1px solid #e5e7eb !important;
-            background-color: #ffffff !important;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05) !important;
+            border: 1px solid {border} !important;
+            background-color: {surface} !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
             padding: 1.1rem !important;
-        }
+        }}
 
-        /* Expander */
-        details {
+        details {{
             border-radius: 14px !important;
-            border: 1px solid #e5e7eb !important;
-            background-color: #f9fafb !important;
-        }
+            border: 1px solid {border} !important;
+            background-color: {surface_2} !important;
+        }}
 
-        /* Dataframe / Data editor */
-        [data-testid="stDataFrame"] {
+        details summary {{
+            color: {text} !important;
+        }}
+
+        [data-testid="stDataFrame"] {{
             border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
-        }
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }}
 
-        /* Cards de resultado */
-        .result-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 22px;
-            padding: 18px;
-            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
-            margin-bottom: 14px;
-        }
-
-        .channel-title {
+        .channel-title {{
             font-size: 1.05rem;
-            font-weight: 800;
+            font-weight: 850;
             margin-bottom: 0.15rem;
-        }
+        }}
 
-        .muted-text {
-            color: #6b7280;
-            font-size: 0.88rem;
-        }
+        .channel-title a {{
+            color: {text};
+            text-decoration: none;
+        }}
 
-        .badge {
+        .channel-title a:hover {{
+            text-decoration: underline;
+        }}
+
+        .badge {{
             display: inline-block;
             padding: 5px 10px;
             border-radius: 999px;
@@ -229,29 +233,33 @@ def aplicar_estilo_saas():
             background-color: #eef2ff;
             color: #3730a3;
             margin-top: 6px;
-        }
+        }}
 
-        .badge-green {
+        .badge-green {{
             background-color: #ecfdf5;
             color: #047857;
-        }
+        }}
 
-        .badge-red {
-            background-color: #fef2f2;
-            color: #b91c1c;
-        }
+        .sidebar-tip {{
+            background-color: {info_bg};
+            color: {info_text} !important;
+            padding: 16px;
+            border-radius: 16px;
+            font-weight: 650;
+            line-height: 1.45;
+        }}
 
-        /* Separador */
-        hr {
+        hr {{
             border: none;
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid {border};
             margin: 1.5rem 0;
-        }
+        }}
+
+        label, p, span, div {{
+            color: inherit;
+        }}
     </style>
     """, unsafe_allow_html=True)
-
-
-aplicar_estilo_saas()
 
 
 # ============================================================
@@ -476,16 +484,6 @@ def formatar_numero(valor):
         return str(valor)
 
 
-def metric_card(label, value, helper="", emoji=""):
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-label">{emoji} {label}</div>
-        <div class="metric-value">{value}</div>
-        <div class="metric-helper">{helper}</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
 def section_header(title, caption):
     st.markdown(f"""
     <div class="section-title">{title}</div>
@@ -502,7 +500,8 @@ valores_iniciais = {
     'resultados_busca': [],
     'next_page_token': None,
     'termo_atual': "",
-    'sugestoes_cache': []
+    'sugestoes_cache': [],
+    'dark_mode': False
 }
 
 for chave, valor in valores_iniciais.items():
@@ -511,66 +510,23 @@ for chave, valor in valores_iniciais.items():
 
 
 # ============================================================
-# HEADER DO DASHBOARD
-# ============================================================
-
-st.markdown("""
-<div class="main-title">🎯 Outlier Hunter Pro</div>
-<div class="subtitle">
-    Descubra canais pequenos com performance fora da curva no YouTube.
-</div>
-""", unsafe_allow_html=True)
-
-df_atual = carregar_salvos()
-total_salvos = len(df_atual)
-
-if "GOOGLE_API_KEY" in st.secrets:
-    api_key = st.secrets["GOOGLE_API_KEY"]
-    status_sistema = "Online"
-    status_helper = "API configurada"
-    status_emoji = "🟢"
-else:
-    api_key = None
-    status_sistema = "Configurar"
-    status_helper = "Adicione sua API Key"
-    status_emoji = "🔴"
-
-col_m1, col_m2, col_m3 = st.columns(3)
-
-with col_m1:
-    metric_card(
-        label="Canais na Biblioteca",
-        value=total_salvos,
-        helper="Leads salvos no banco local",
-        emoji="📁"
-    )
-
-with col_m2:
-    metric_card(
-        label="Custo da Sessão API",
-        value=st.session_state['quota_usada'],
-        helper="Estimativa de unidades usadas",
-        emoji="⚡"
-    )
-
-with col_m3:
-    metric_card(
-        label="Status do Sistema",
-        value=f"{status_sistema} {status_emoji}",
-        helper=status_helper,
-        emoji="🧩"
-    )
-
-st.markdown("<hr>", unsafe_allow_html=True)
-
-
-# ============================================================
 # SIDEBAR
 # ============================================================
+
+api_key = st.secrets["GOOGLE_API_KEY"] if "GOOGLE_API_KEY" in st.secrets else None
 
 with st.sidebar:
     st.markdown("## ⚙️ Settings")
     st.caption("Configure a API e os filtros globais da busca.")
+
+    st.markdown("---")
+
+    dark_mode = st.toggle(
+        "🌙 Dark mode",
+        value=st.session_state['dark_mode']
+    )
+
+    st.session_state['dark_mode'] = dark_mode
 
     st.markdown("---")
 
@@ -583,6 +539,8 @@ with st.sidebar:
 
         if api_key_digitada:
             api_key = api_key_digitada
+    else:
+        st.success("API Key configurada")
 
     region = st.selectbox(
         "Região Alvo",
@@ -596,250 +554,273 @@ with st.sidebar:
 
     st.markdown("---")
 
-    st.info(
-        "Dica: filtros muito restritos podem retornar poucos canais. "
-        "Comece amplo e depois refine."
+    st.markdown("""
+    <div class="sidebar-tip">
+        Dica: filtros muito restritos podem retornar poucos canais.
+        Comece amplo e depois refine.
+    </div>
+    """, unsafe_allow_html=True)
+
+
+aplicar_estilo_saas(st.session_state['dark_mode'])
+
+
+# ============================================================
+# HEADER PRINCIPAL
+# ============================================================
+
+st.markdown("""
+<div class="main-title">🎯 Outlier Hunter Pro</div>
+<div class="subtitle">
+    Pesquise palavras-chave e encontre canais pequenos com performance fora da curva.
+</div>
+""", unsafe_allow_html=True)
+
+
+# ============================================================
+# BLOCO PRINCIPAL DE BUSCA
+# ============================================================
+
+section_header(
+    "Pesquisa de Palavras-chave",
+    "Digite um nicho ou termo para encontrar canais promissores no YouTube."
+)
+
+with st.container(border=True):
+    c1, c2 = st.columns([3, 1])
+
+    query = c1.text_input(
+        "Palavra-chave ou Nicho",
+        "Marketing Digital",
+        placeholder="Ex: Finanças, Roblox, Receitas..."
     )
 
+    duracao = c2.selectbox(
+        "Formato",
+        ["Qualquer", "Vídeo Médio (4-20m)", "Vídeo Longo (>20m)"],
+        index=1
+    )
+
+    with st.expander("🛠️ Filtros Avançados de Tamanho"):
+        col_sub1, col_sub2, col_vid1, col_vid2 = st.columns(4)
+
+        min_subs = col_sub1.number_input(
+            "Mín. Inscritos",
+            value=1000,
+            step=100
+        )
+
+        max_subs = col_sub2.number_input(
+            "Máx. Inscritos",
+            value=10000000,
+            step=1000
+        )
+
+        min_videos = col_vid1.number_input(
+            "Mín. Vídeos",
+            value=1,
+            step=1
+        )
+
+        max_videos = col_vid2.number_input(
+            "Máx. Vídeos",
+            value=50,
+            step=1
+        )
+
+        max_results = st.slider(
+            "Velocidade da Busca",
+            10,
+            50,
+            50,
+            help="Quantidade de vídeos analisados por varredura."
+        )
+
+    mapa_dur = {
+        "Qualquer": None,
+        "Vídeo Médio (4-20m)": "medium",
+        "Vídeo Longo (>20m)": "long"
+    }
+
+    col_btn1, col_btn2 = st.columns([1, 2])
+
+    if col_btn1.button(
+        "🔍 Iniciar Varredura",
+        type="primary",
+        use_container_width=True
+    ):
+        if api_key:
+            with st.spinner("Analisando o YouTube..."):
+                st.session_state['resultados_busca'] = []
+                st.session_state['next_page_token'] = None
+
+                res = executar_busca(
+                    api_key=api_key,
+                    query=query,
+                    max_results=max_results,
+                    duration=mapa_dur[duracao],
+                    min_subs=min_subs,
+                    max_subs=max_subs,
+                    min_videos=min_videos,
+                    max_videos=max_videos,
+                    region_code=region_param,
+                    usar_proxima_pagina=False
+                )
+
+                st.session_state['resultados_busca'] = res
+
+                if not res:
+                    st.warning("Nenhum canal atendeu aos filtros atuais.")
+
+        else:
+            st.error("Configure sua API Key nas Settings da barra lateral.")
+
+    if st.session_state['termo_atual']:
+        if st.session_state['next_page_token']:
+            if col_btn2.button(
+                f"🔄 Aprofundar busca para '{st.session_state['termo_atual']}'",
+                use_container_width=True
+            ):
+                if api_key:
+                    with st.spinner("Cavando mais fundo..."):
+                        res = executar_busca(
+                            api_key=api_key,
+                            query=st.session_state['termo_atual'],
+                            max_results=max_results,
+                            duration=mapa_dur[duracao],
+                            min_subs=min_subs,
+                            max_subs=max_subs,
+                            min_videos=min_videos,
+                            max_videos=max_videos,
+                            region_code=region_param,
+                            usar_proxima_pagina=True
+                        )
+
+                        links_existentes = {
+                            c['Link']
+                            for c in st.session_state['resultados_busca']
+                        }
+
+                        novos = [
+                            c for c in res
+                            if c['Link'] not in links_existentes
+                        ]
+
+                        st.session_state['resultados_busca'].extend(novos)
+
+                        if novos:
+                            st.toast(f"✅ {len(novos)} novos canais adicionados!")
+                        else:
+                            st.toast("Nenhum canal novo nesta página.")
+
+                else:
+                    st.error("Configure sua API Key nas Settings da barra lateral.")
+        else:
+            col_btn2.info("🏁 Varredura completa para este termo.")
+
 
 # ============================================================
-# ABAS PRINCIPAIS
+# RESULTADOS DA BUSCA
 # ============================================================
 
-tab_busca, tab_discovery, tab_salvos = st.tabs([
-    "🔍 Motor de Busca",
+if st.session_state['resultados_busca']:
+    st.markdown(
+        f"### 📋 Resultados Encontrados ({len(st.session_state['resultados_busca'])})"
+    )
+
+    for i, canal in enumerate(st.session_state['resultados_busca']):
+        is_viral = canal['Média Views'] > canal['Inscritos']
+        canal_novo = canal['Dias Vida'] < 90
+
+        nome_seguro = html.escape(str(canal['Nome']))
+        link_seguro = html.escape(str(canal['Link']))
+
+        with st.container(border=True):
+            col_img, col_info, col_metrics, col_btn = st.columns(
+                [1, 4, 2, 1],
+                gap="medium"
+            )
+
+            with col_img:
+                if canal.get('Thumb'):
+                    st.image(canal['Thumb'], width=82)
+                else:
+                    st.markdown("🎬")
+
+            with col_info:
+                st.markdown(
+                    f"""
+                    <div class="channel-title">
+                        <a href="{link_seguro}" target="_blank">
+                            {nome_seguro}
+                        </a>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                if canal_novo:
+                    st.markdown(
+                        f"""
+                        <span class="badge badge-green">
+                            🚀 Promessa: {canal['Dias Vida']} dias de vida
+                        </span>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                else:
+                    st.markdown(
+                        f"""
+                        <span class="badge">
+                            📅 Ativo há {canal['Dias Vida']} dias
+                        </span>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                st.caption(f"📍 Região: {canal['País']} · Criado em {canal['Criação']}")
+
+            with col_metrics:
+                st.markdown(f"👤 **{formatar_numero(canal['Inscritos'])}** inscritos")
+                st.markdown(f"🎥 **{formatar_numero(canal['Vídeos'])}** vídeos")
+
+                if is_viral:
+                    st.markdown(
+                        f"📈 Média: :green[**{formatar_numero(canal['Média Views'])}**] 🔥"
+                    )
+                else:
+                    st.markdown(
+                        f"📈 Média: **{formatar_numero(canal['Média Views'])}**"
+                    )
+
+            with col_btn:
+                st.markdown("<br>", unsafe_allow_html=True)
+
+                if st.button(
+                    "Salvar",
+                    key=f"s_{i}_{canal['Link']}",
+                    use_container_width=True
+                ):
+                    if salvar_canal(canal):
+                        st.toast("Canal salvo na Biblioteca!")
+                    else:
+                        st.toast("Canal já estava salvo.")
+
+
+# ============================================================
+# ABAS SECUNDÁRIAS
+# ============================================================
+
+st.markdown("<hr>", unsafe_allow_html=True)
+
+tab_discovery, tab_salvos = st.tabs([
     "🧠 Inteligência de Nicho",
     "💾 Biblioteca de Leads"
 ])
 
 
 # ============================================================
-# ABA 1 - MOTOR DE BUSCA
-# ============================================================
-
-with tab_busca:
-    section_header(
-        "Motor de Busca",
-        "Encontre canais recentes e filtre por tamanho, formato e potencial de outlier."
-    )
-
-    with st.container(border=True):
-        c1, c2 = st.columns([3, 1])
-
-        query = c1.text_input(
-            "Palavra-chave ou Nicho",
-            "Marketing Digital",
-            placeholder="Ex: Finanças, Roblox, Receitas..."
-        )
-
-        duracao = c2.selectbox(
-            "Formato",
-            ["Qualquer", "Vídeo Médio (4-20m)", "Vídeo Longo (>20m)"],
-            index=1
-        )
-
-        with st.expander("🛠️ Filtros Avançados de Tamanho"):
-            col_sub1, col_sub2, col_vid1, col_vid2 = st.columns(4)
-
-            min_subs = col_sub1.number_input(
-                "Mín. Inscritos",
-                value=1000,
-                step=100
-            )
-
-            max_subs = col_sub2.number_input(
-                "Máx. Inscritos",
-                value=10000000,
-                step=1000
-            )
-
-            min_videos = col_vid1.number_input(
-                "Mín. Vídeos",
-                value=1,
-                step=1
-            )
-
-            max_videos = col_vid2.number_input(
-                "Máx. Vídeos",
-                value=50,
-                step=1
-            )
-
-            max_results = st.slider(
-                "Velocidade da Busca",
-                10,
-                50,
-                50,
-                help="Quantidade de vídeos analisados por varredura."
-            )
-
-        mapa_dur = {
-            "Qualquer": None,
-            "Vídeo Médio (4-20m)": "medium",
-            "Vídeo Longo (>20m)": "long"
-        }
-
-        col_btn1, col_btn2 = st.columns([1, 2])
-
-        if col_btn1.button(
-            "🔍 Iniciar Varredura",
-            type="primary",
-            use_container_width=True
-        ):
-            if api_key:
-                with st.spinner("Analisando o YouTube..."):
-                    st.session_state['resultados_busca'] = []
-                    st.session_state['next_page_token'] = None
-
-                    res = executar_busca(
-                        api_key=api_key,
-                        query=query,
-                        max_results=max_results,
-                        duration=mapa_dur[duracao],
-                        min_subs=min_subs,
-                        max_subs=max_subs,
-                        min_videos=min_videos,
-                        max_videos=max_videos,
-                        region_code=region_param,
-                        usar_proxima_pagina=False
-                    )
-
-                    st.session_state['resultados_busca'] = res
-
-                    if not res:
-                        st.warning("Nenhum canal atendeu aos filtros atuais.")
-
-            else:
-                st.error("Configure sua API Key nas Settings da barra lateral.")
-
-        if st.session_state['termo_atual']:
-            if st.session_state['next_page_token']:
-                if col_btn2.button(
-                    f"🔄 Aprofundar busca para '{st.session_state['termo_atual']}'",
-                    use_container_width=True
-                ):
-                    if api_key:
-                        with st.spinner("Cavando mais fundo..."):
-                            res = executar_busca(
-                                api_key=api_key,
-                                query=st.session_state['termo_atual'],
-                                max_results=max_results,
-                                duration=mapa_dur[duracao],
-                                min_subs=min_subs,
-                                max_subs=max_subs,
-                                min_videos=min_videos,
-                                max_videos=max_videos,
-                                region_code=region_param,
-                                usar_proxima_pagina=True
-                            )
-
-                            links_existentes = {
-                                c['Link']
-                                for c in st.session_state['resultados_busca']
-                            }
-
-                            novos = [
-                                c for c in res
-                                if c['Link'] not in links_existentes
-                            ]
-
-                            st.session_state['resultados_busca'].extend(novos)
-
-                            if novos:
-                                st.toast(f"✅ {len(novos)} novos canais adicionados!")
-                            else:
-                                st.toast("Nenhum canal novo nesta página.")
-
-                    else:
-                        st.error("Configure sua API Key nas Settings da barra lateral.")
-
-            else:
-                col_btn2.info("🏁 Varredura completa para este termo.")
-
-    # Resultados
-    if st.session_state['resultados_busca']:
-        st.markdown(
-            f"### 📋 Resultados Encontrados ({len(st.session_state['resultados_busca'])})"
-        )
-
-        for i, canal in enumerate(st.session_state['resultados_busca']):
-            is_viral = canal['Média Views'] > canal['Inscritos']
-            canal_novo = canal['Dias Vida'] < 90
-
-            with st.container(border=True):
-                col_img, col_info, col_metrics, col_btn = st.columns(
-                    [1, 4, 2, 1],
-                    gap="medium"
-                )
-
-                with col_img:
-                    if canal.get('Thumb'):
-                        st.image(canal['Thumb'], width=82)
-                    else:
-                        st.markdown("🎬")
-
-                with col_info:
-                    st.markdown(
-                        f"""
-                        <div class="channel-title">
-                            <a href="{canal['Link']}" target="_blank">
-                                {canal['Nome']}
-                            </a>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-
-                    if canal_novo:
-                        st.markdown(
-                            f"""
-                            <span class="badge badge-green">
-                                🚀 Promessa: {canal['Dias Vida']} dias de vida
-                            </span>
-                            """,
-                            unsafe_allow_html=True
-                        )
-                    else:
-                        st.markdown(
-                            f"""
-                            <span class="badge">
-                                📅 Ativo há {canal['Dias Vida']} dias
-                            </span>
-                            """,
-                            unsafe_allow_html=True
-                        )
-
-                    st.caption(f"📍 Região: {canal['País']} · Criado em {canal['Criação']}")
-
-                with col_metrics:
-                    st.markdown(f"👤 **{formatar_numero(canal['Inscritos'])}** inscritos")
-                    st.markdown(f"🎥 **{formatar_numero(canal['Vídeos'])}** vídeos")
-
-                    if is_viral:
-                        st.markdown(
-                            f"📈 Média: :green[**{formatar_numero(canal['Média Views'])}**] 🔥"
-                        )
-                    else:
-                        st.markdown(
-                            f"📈 Média: **{formatar_numero(canal['Média Views'])}**"
-                        )
-
-                with col_btn:
-                    st.markdown("<br>", unsafe_allow_html=True)
-
-                    if st.button(
-                        "Salvar",
-                        key=f"s_{i}_{canal['Link']}",
-                        use_container_width=True
-                    ):
-                        if salvar_canal(canal):
-                            st.toast("Canal salvo na Biblioteca!")
-                        else:
-                            st.toast("Canal já estava salvo.")
-
-
-# ============================================================
-# ABA 2 - INTELIGÊNCIA DE NICHO
+# ABA - INTELIGÊNCIA DE NICHO
 # ============================================================
 
 with tab_discovery:
@@ -901,8 +882,7 @@ with tab_discovery:
                             st.session_state['resultados_busca'] = res
 
                             st.success(
-                                "Busca concluída! Volte para a aba "
-                                "'Motor de Busca' para ver os resultados."
+                                "Busca concluída! Os resultados aparecerão na área principal de busca."
                             )
 
                     else:
@@ -910,7 +890,7 @@ with tab_discovery:
 
 
 # ============================================================
-# ABA 3 - BIBLIOTECA DE LEADS
+# ABA - BIBLIOTECA DE LEADS
 # ============================================================
 
 with tab_salvos:
@@ -954,5 +934,5 @@ with tab_salvos:
 
     else:
         st.info(
-            "Sua biblioteca está vazia. Comece salvando canais na aba de Busca."
+            "Sua biblioteca está vazia. Comece salvando canais na busca principal."
         )
