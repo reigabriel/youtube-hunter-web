@@ -351,20 +351,20 @@ def executar_busca(api_key, query, max_results, duration, min_subs, max_subs, mi
         st.error(f"Erro na API: {e}")
         return []
 
-def executar_busca_virais(api_key, query, max_results, min_views, region_code, usar_proxima_pagina=False):
+def executar_busca_virais(api_key, query, max_results, min_views, region_code, duration, usar_proxima_pagina=False):
     try:
         youtube = build('youtube', 'v3', developerKey=api_key)
         token = st.session_state['next_page_token_virais'] if usar_proxima_pagina else None
         
         st.session_state['quota_usada'] += 100
         
-        # O SEGREDO DOS VIRAIS: order='viewCount'
         search_params = {
             'q': query, 'part': 'snippet', 'type': 'video',
             'maxResults': max_results, 'order': 'viewCount' 
         }
         if token: search_params['pageToken'] = token
         if region_code: search_params['regionCode'] = region_code
+        if duration: search_params['videoDuration'] = duration # <-- Filtro de Duração Adicionado
 
         request = youtube.search().list(**search_params)
         response = request.execute()
@@ -579,10 +579,16 @@ with tab_virais:
     section_header("Garimpo de Vídeos Milionários", "Encontre vídeos de alta performance para modelar roteiros e thumbnails.")
 
     with st.container(border=True):
-        c1, c2, c3 = st.columns([3, 1, 1])
+        c1, c2 = st.columns([3, 1])
         query_viral = c1.text_input("Nicho ou Assunto", "Inteligência Artificial", key="q_virais")
-        min_views = c2.number_input("Mínimo de Views", value=1000000, step=100000)
-        max_results_viral = c3.slider("Amostra", 10, 50, 50, key="slider_virais")
+        # Filtro de duração adicionado aqui, sem opção para "Qualquer"
+        duracao_viral = c2.selectbox("Formato", ["Vídeo Médio (4-20m)", "Vídeo Longo (>20m)"], index=0, key="d_virais")
+        
+        c3, c4 = st.columns(2)
+        min_views = c3.number_input("Mínimo de Views", value=1000000, step=100000)
+        max_results_viral = c4.slider("Amostra", 10, 50, 50, key="slider_virais")
+        
+        mapa_dur_viral = {"Vídeo Médio (4-20m)": "medium", "Vídeo Longo (>20m)": "long"}
         
         col_btn1, col_btn2 = st.columns([1, 2])
 
@@ -591,7 +597,8 @@ with tab_virais:
                 with st.spinner("Buscando sucessos do YouTube..."):
                     st.session_state['resultados_virais'] = []
                     st.session_state['next_page_token_virais'] = None
-                    res = executar_busca_virais(api_key, query_viral, max_results_viral, min_views, region_param, False)
+                    # Agora passamos a duração correta para excluir os shorts
+                    res = executar_busca_virais(api_key, query_viral, max_results_viral, min_views, region_param, mapa_dur_viral[duracao_viral], False)
                     st.session_state['resultados_virais'] = res
                     if not res: st.warning("Nenhum vídeo com essa quantidade de views foi encontrado.")
             else: st.error("Configure sua API Key nas Settings da barra lateral.")
@@ -601,7 +608,7 @@ with tab_virais:
                 if col_btn2.button(f"🔄 Carregar mais vídeos de '{st.session_state['termo_atual_viral']}'", use_container_width=True):
                     if api_key:
                         with st.spinner("Buscando mais sucessos..."):
-                            res = executar_busca_virais(api_key, st.session_state['termo_atual_viral'], max_results_viral, min_views, region_param, True)
+                            res = executar_busca_virais(api_key, st.session_state['termo_atual_viral'], max_results_viral, min_views, region_param, mapa_dur_viral[duracao_viral], True)
                             links_existentes = {c['Link'] for c in st.session_state['resultados_virais']}
                             novos = [c for c in res if c['Link'] not in links_existentes]
                             st.session_state['resultados_virais'].extend(novos)
