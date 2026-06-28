@@ -388,7 +388,6 @@ def executar_busca_virais(api_key, query, max_results, min_views, max_views, reg
             likes = int(stats.get('likeCount', 0))
             comments = int(stats.get('commentCount', 0))
             
-            # Filtro atualizado para considerar Mínimo e Máximo
             if min_views <= views <= max_views:
                 novos.append({
                     'Título': snippet.get('title', 'Sem título'),
@@ -585,8 +584,9 @@ with tab_virais:
         duracao_viral = c2.selectbox("Formato", ["Vídeo Médio (4-20m)", "Vídeo Longo (>20m)"], index=0, key="d_virais")
         
         c3, c4, c5 = st.columns(3)
-        min_views = c3.number_input("Mínimo de Views", value=1000000, step=100000)
-        max_views = c4.number_input("Máximo de Views", value=1000000000, step=1000000)
+        # Valores padrão atualizados
+        min_views = c3.number_input("Mínimo de Views", value=300000, step=100000)
+        max_views = c4.number_input("Máximo de Views", value=10000000, step=1000000)
         max_results_viral = c5.slider("Amostra", 10, 50, 50, key="slider_virais")
         
         mapa_dur_viral = {"Vídeo Médio (4-20m)": "medium", "Vídeo Longo (>20m)": "long"}
